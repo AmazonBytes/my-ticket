@@ -25,33 +25,11 @@ public class CinemaService {
         return movies;
     }
 
-    public Room getRoomForMovie(Movie movie) {
+    public Room getRoomForMovie() {
         return room;
     }
 
-    public boolean reserveSeat(String customer, Movie movie, Room room, int row, int col) {
+    public boolean reserveSeat(Room room, int row, int col) {
         return room.reserveSeat(row, col);
-    }
-
-    public String generateReservationMessage(String customerName, String[] seats, Movie selectedMovie) {
-        return String.format(
-                "Seats reserved for %s: %s\nMovie: %s\nDuration: %d min\nGenre: %s\nEnjoy your session!",
-                customerName,
-                String.join(" ", seats),
-                selectedMovie.getTitle(),
-                selectedMovie.getDuration(),
-                selectedMovie.getGenre()
-        );
-    }
-
-    public void printMoviesList() {
-        for (Movie movie : movies) {
-            System.out.printf(
-                    "%s | Duration: %s | Genre: %s\n",
-                    movie.getTitle(),
-                    movie.getDuration(),
-                    movie.getGenre()
-            );
-        }
     }
 }

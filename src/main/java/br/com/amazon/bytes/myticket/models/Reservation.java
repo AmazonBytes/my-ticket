@@ -2,11 +2,11 @@ package main.java.br.com.amazon.bytes.myticket.models;
 
 public class Reservation {
 
-    private String customer;
-    private Movie movie;
-    private Room room;
-    private int row;
-    private int col;
+    private final String customer;
+    private final Movie movie;
+    private final Room room;
+    private final int row;
+    private final int col;
 
     public Reservation(String customer, Movie movie, Room room, int row, int col) {
         this.customer = customer;

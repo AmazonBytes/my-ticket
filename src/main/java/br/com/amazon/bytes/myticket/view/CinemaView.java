@@ -9,6 +9,8 @@ import java.util.Scanner;
 
 public class CinemaView {
 
+    private static final String SEPARATOR = "**************************************";
+
     private final CinemaService service;
     private final Scanner scanner = new Scanner(System.in);
 
@@ -49,8 +51,10 @@ public class CinemaView {
         }
         for (int i = 0; i < movies.size(); i++) {
             Movie m = movies.get(i);
-            System.out.printf("%d. %s | Duration: %s | Genre: %s\n", i + 1, m.getTitle(), m.getDuration(), m.getGenre());
+            System.out.printf("%d. %s | Duration: %s | Genre: %s%n", i + 1, m.getTitle(), m.getDuration(), m.getGenre());
+
         }
+        System.out.println(SEPARATOR);
         System.out.print("Pressione ENTER para voltar ao menu principal...");
         scanner.nextLine();
     }
@@ -61,11 +65,11 @@ public class CinemaView {
             System.out.println("Nenhum filme disponível.");
             return;
         }
-        System.out.println("**************************************");
+        System.out.println(SEPARATOR);
         for (int i = 0; i < movies.size(); i++) {
             System.out.println((i + 1) + ". " + movies.get(i).getTitle());
         }
-        System.out.println("**************************************");
+        System.out.println(SEPARATOR);
         System.out.print("Escolha o filme: ");
         if (!scanner.hasNextInt()) {
             System.out.println("Entrada inválida.");
@@ -92,43 +96,43 @@ public class CinemaView {
         int seatCount = scanner.nextInt();
         scanner.nextLine();
 
-        Room room = service.getRoomForMovie(movie);
+        Room room = service.getRoomForMovie();
 
         System.out.println("Escolha seu assento abaixo:");
         showSeats(room);
 
-        String[] chosenSeats = new String[seatCount];
-        for (int i = 0; i < seatCount; i++) {
-            System.out.print("Escolha o assento (" + (i + 1) + "): ");
+        int reserved = 0;
+        while (reserved < seatCount) {
+            System.out.print("Escolha o assento (" + (reserved + 1) + "): ");
             String seatName = scanner.nextLine();
             int[] pos = parseSeatName(seatName);
-            if (pos == null || pos[0] < 0 || pos[1] < 0 || pos[0] >= room.getRows() || pos[1] >= room.getCols()) {
+
+            boolean invalid = pos.length == 0 || pos[0] < 0 || pos[1] < 0 || pos[0] >= room.getRows() || pos[1] >= room.getCols();
+            boolean alreadyReserved = !invalid && room.isReserved(pos[0], pos[1]);
+
+            if (invalid) {
                 System.out.println("Assento inválido.");
-                i--;
-                continue;
-            }
-            if (room.isReserved(pos[0], pos[1])) {
+            } else if (alreadyReserved) {
                 System.out.println("Assento já reservado.");
-                i--;
-                continue;
+            } else {
+                room.reserveSeat(pos[0], pos[1]);
+                reserved++;
             }
-            room.reserveSeat(pos[0], pos[1]);
-            chosenSeats[i] = seatName;
         }
-        System.out.println("");
+
+        System.out.println();
         System.out.println("Parabéns " + customer + ", reservou " + seatCount + " ingressos com sucesso para o filme " + movie.getTitle() + ", Boa sessão!");
-        System.out.println("");
+        System.out.println();
         System.out.println("Tabela de assentos atualizada:");
-        System.out.println("");
+        System.out.println();
         showSeats(room);
-        System.out.println("");
-        System.out.println("**************************************");
-        System.out.println("");
+        System.out.println();
+        System.out.println(SEPARATOR);
+        System.out.println();
         System.out.println("Finalizando o sistema... Volte Sempre " + customer + "!");
         System.exit(0);
     }
 
-    // Função auxiliar para converter "R1C2" em índices
     private int[] parseSeatName(String seatName) {
         try {
             String[] parts = seatName.substring(1).split("C");
@@ -136,7 +140,7 @@ public class CinemaView {
             int col = Integer.parseInt(parts[1]) - 1;
             return new int[]{row, col};
         } catch (Exception e) {
-            return null;
+            return new int[0];
         }
     }
 
